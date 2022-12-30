@@ -15,6 +15,7 @@ import XMonad.Util.Run
 import XMonad.Layout.Spacing
 
 import XMonad.Hooks.ManageDocks
+import XMonad.Hooks.DynamicLog
 
 import Data.Monoid
 import System.Exit
@@ -22,8 +23,7 @@ import System.Exit
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
 
-myTerminal      = "alacritty"
-myTextEditor 	= "nvim"
+myTerminal = "alacritty"
 
 -- Whether focus follows the mouse pointer.
 myFocusFollowsMouse :: Bool
@@ -36,14 +36,14 @@ myClickJustFocuses = False
 
 -- Width of the window border in pixels.
 --
-myBorderWidth   = 3
+myBorderWidth   = 2
 
 -- modMask lets you specify which modkey you want to use. The default
 -- is mod1Mask ("left alt").  You may also consider using mod3Mask
 -- ("right alt"), which does not conflict with emacs keybindings. The
 -- "windows key" is usually mod4Mask.
 --
-myModMask       = mod1Mask
+myModMask = mod1Mask
 
 -- The default number of workspaces (virtual screens) and their names.
 -- By default we use numeric strings, but any string may be used as a
@@ -54,12 +54,14 @@ myModMask       = mod1Mask
 --
 -- > workspaces = ["web", "irc", "code" ] ++ map show [4..9]
 --
+
+-- Non-Clickable Workspaces
 myWorkspaces    = ["1","2","3","4","5","6","7","8","9"]
 
 -- Border colors for unfocused and focused windows, respectively.
 --
 myNormalBorderColor  = "#dddddd"
-myFocusedBorderColor = "#008080"
+myFocusedBorderColor = "#ff0000"
 
 ------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.
@@ -188,7 +190,7 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- The available layouts.  Note that each layout is separated by |||,
 -- which denotes layout choice.
 --
-myLayout = smartSpacing 6 $ avoidStruts (tiled ||| Mirror tiled ||| Full)
+myLayout = smartSpacing 4 $ avoidStruts (tiled ||| Mirror tiled ||| Full)
   	where
     	-- default tiling algorithm partitions the screen into two panes
 		tiled   = Tall nmaster delta ratio
@@ -235,14 +237,6 @@ myManageHook = composeAll
 myEventHook = mempty
 
 ------------------------------------------------------------------------
--- Status bars and logging
-
--- Perform an arbitrary action on each internal state change or X event.
--- See the 'XMonad.Hooks.DynamicLog' extension for examples.
---
-myLogHook = return ()
-
-------------------------------------------------------------------------
 -- Startup hook
 
 -- Perform an arbitrary action each time xmonad starts or is restarted
@@ -260,15 +254,7 @@ myStartupHook = do
 --
 main = do
 	xmproc <- spawnPipe "xmobar -x 0 ~/.config/xmobar/xmobarrc"
-	xmonad $ docks defaults
-
--- A structure containing your configuration settings, overriding
--- fields in the default config. Any you don't override, will
--- use the defaults defined in xmonad/XMonad/Config.hs
---
--- No need to modify this.
---
-defaults = def {
+	xmonad $ docks def {
       -- simple stuff
         terminal           = myTerminal,
         focusFollowsMouse  = myFocusFollowsMouse,
@@ -287,9 +273,20 @@ defaults = def {
         layoutHook         = myLayout,
         manageHook         = myManageHook,
         handleEventHook    = myEventHook,
-        logHook            = myLogHook,
+        logHook            = dynamicLogWithPP $ xmobarPP
+								{ ppOutput = \x -> hPutStrLn xmproc x
+								, ppCurrent = xmobarColor "#98be65" "" . wrap "[" "]" -- Current workspace in xmobar
+								, ppVisible = xmobarColor "#98be65" "" 				  -- Visible but not current workspace
+								, ppHidden = xmobarColor "#82AAFF" "" . wrap "*" ""   -- Hidden workspaces in xmobar
+								, ppHiddenNoWindows = xmobarColor "#c792ea" "" 		  -- Hidden workspaces (no windows)
+								, ppTitle = xmobarColor "#b3afc2" "" . shorten 60     -- Title of active window in xmobar
+								, ppSep = "<fc=#666666> | </fc>" 		  -- Separators in xmobar
+								, ppUrgent = xmobarColor "#c45500" "" . wrap "!" "!"  -- Urgent workspace
+								, ppOrder = \(ws:l:t:ex) -> [ws,l]++ex++[t] 		  
+								},
+
         startupHook        = myStartupHook
-    }
+	}
 
 -- | Finally, a copy of the default bindings in simple textual tabular format.
 help :: String

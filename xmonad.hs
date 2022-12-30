@@ -252,6 +252,7 @@ myEventHook = mempty
 myStartupHook = do 
 	spawnOnce "feh --bg-fill --randomize ~/Pictures/Backgrounds/* &"
 	spawnOnce "sxhkd -c ~/.config/sxhkd/sxhkdrc"
+	spawnOnce "xss-lock slock"
 
 ------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.

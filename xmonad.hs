@@ -251,6 +251,7 @@ myEventHook = mempty
 -- By default, do nothing.
 myStartupHook = do 
 	spawnOnce "feh --bg-fill --randomize ~/Pictures/Backgrounds/* &"
+	spawnOnce "sxhkd -c ~/.config/sxhkd/sxhkdrc"
 
 ------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.

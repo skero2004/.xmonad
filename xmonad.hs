@@ -21,6 +21,7 @@ import Data.Monoid
 import System.Exit
 
 import qualified XMonad.StackSet as W
+import qualified XMonad.Actions.CycleWS as CWS
 import qualified Data.Map        as M
 
 myTerminal = "alacritty"
@@ -125,6 +126,10 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- Deincrement the number of windows in the master area
     , ((modm              , xK_period), sendMessage (IncMasterN (-1)))
 
+	-- Cycling workspaces
+	, ((modm .|. shiftMask, xK_l), CWS.nextWS)
+	, ((modm .|. shiftMask, xK_h), CWS.prevWS)
+
     -- Toggle the status bar gap
     -- Use this binding with avoidStruts from Hooks.ManageDocks.
     -- See also the statusBar function from Hooks.DynamicLog.
@@ -190,7 +195,7 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- The available layouts.  Note that each layout is separated by |||,
 -- which denotes layout choice.
 --
-myLayout = smartSpacing 4 $ avoidStruts (tiled ||| Mirror tiled ||| Full)
+myLayout = smartSpacing 4 $ avoidStruts (tiled ||| Full ||| Mirror tiled)
   	where
     	-- default tiling algorithm partitions the screen into two panes
 		tiled   = Tall nmaster delta ratio

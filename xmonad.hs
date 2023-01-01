@@ -254,6 +254,7 @@ myStartupHook = do
 	spawnOnce "sxhkd -c ~/.config/sxhkd/sxhkdrc"
 	spawnOnce "xss-lock slock"
 	spawnOnce "ibus-daemon"
+	spawnOnce "/usr/bin/emacs --daemon"
 
 ------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.

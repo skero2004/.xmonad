@@ -44,7 +44,7 @@ myBorderWidth   = 2
 -- ("right alt"), which does not conflict with emacs keybindings. The
 -- "windows key" is usually mod4Mask.
 --
-myModMask = mod1Mask
+myModMask = mod4Mask
 
 -- The default number of workspaces (virtual screens) and their names.
 -- By default we use numeric strings, but any string may be used as a
@@ -250,11 +250,10 @@ myEventHook = mempty
 --
 -- By default, do nothing.
 myStartupHook = do 
-	spawnOnce "feh --bg-fill --randomize ~/Pictures/Backgrounds/* &"
+	spawnOnce "feh --bg-fill --randomize ~/Pictures/Backgrounds/*"
 	spawnOnce "sxhkd -c ~/.config/sxhkd/sxhkdrc"
 	spawnOnce "xss-lock slock"
 	spawnOnce "ibus-daemon"
-	spawnOnce "/usr/bin/emacs --daemon"
 
 ------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.
